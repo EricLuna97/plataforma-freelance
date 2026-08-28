@@ -1,0 +1,1 @@
+CREATE DATABASE freelance_test;
