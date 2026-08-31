@@ -1,0 +1,73 @@
+// ======================================================
+// CONFIGURACIÓN PRINCIPAL DE PRISMA
+// ======================================================
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Aquí lee la URL secreta de tu .env
+}
+
+// ======================================================
+// TABLA 1: CLIENTES
+// ======================================================
+model Cliente {
+  id_cliente     String      @id @default(uuid())
+  nombre         String      
+  email          String      @unique
+  fecha_registro DateTime    @default(now()) 
+  
+  solicitudes    Solicitud[]
+
+  @@map("clientes") 
+}
+
+// ======================================================
+// TABLA 2: SERVICIOS
+// ======================================================
+model Servicio {
+  id_servicio      String                   @id @default(uuid())
+  nombre_comercial String                   
+  precio           Decimal?                 
+  modelo_cobro     String                   
+  esta_activo      Boolean                  @default(true) 
+  
+  caracteristicas  CaracteristicaServicio[]
+  solicitudes      Solicitud[]
+
+  @@map("servicios")
+}
+
+// ======================================================
+// TABLA 3: CARACTERISTICAS_SERVICIO
+// ======================================================
+model CaracteristicaServicio {
+  id_caracteristica String   @id @default(uuid()) 
+  descripcion       String   
+  orden_visual      Int?     
+  
+  id_servicio       String
+  servicio          Servicio @relation(fields: [id_servicio], references: [id_servicio])
+
+  @@map("caracteristicas_servicio")
+}
+
+// ======================================================
+// TABLA 4: SOLICITUDES
+// ======================================================
+model Solicitud {
+  id_solicitud      String   @id @default(uuid()) 
+  fecha_solicitud   DateTime @default(now())      
+  mensaje_adicional String?                       
+  estado            String   
+  
+  id_cliente        String
+  cliente           Cliente  @relation(fields: [id_cliente], references: [id_cliente])
+  
+  id_servicio       String
+  servicio          Servicio @relation(fields: [id_servicio], references: [id_servicio])
+
+  @@map("solicitudes")
+}
