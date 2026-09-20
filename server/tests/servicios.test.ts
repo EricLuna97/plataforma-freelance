@@ -42,7 +42,7 @@ describe('API de Servicios', () => {
     // 3. Exigimos que nos envíe un mensaje de error claro
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toBe('El nombre comercial es obligatorio');
-  });
+    });
 
     // Sad Path: Falta modelo de cobro
     it('Debería devolver error 400 si falta el modelo_cobro', async () => {
@@ -60,9 +60,9 @@ describe('API de Servicios', () => {
     // 3. Exigimos el mensaje exacto
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toBe('El modelo de cobro es obligatorio');
-  });
+    });
 
-  });
+    });
 
   // Endpoint para listar el catálogo completo
   describe('GET /servicios', () => {
@@ -76,9 +76,9 @@ describe('API de Servicios', () => {
 
     // 3. Exigimos que la respuesta sea un arreglo
     expect(Array.isArray(response.body)).toBe(true);
-  });
+    });
 
-  });
+    });
 
   //Endpoint para ver el detalle de un solo trabajo
   describe('GET /servicios/:id', () => {
@@ -94,7 +94,7 @@ describe('API de Servicios', () => {
     expect(response.body).toHaveProperty('id_servicio', '1');
     // Verificamos que tenga la estructura correcta
     expect(response.body).toHaveProperty('nombre_comercial');
-  });
+    });
 
     // Sad Path: ID no existe
     it('Debería devolver estado 404 si el ID no existe en la base de datos', async () => {
@@ -103,10 +103,9 @@ describe('API de Servicios', () => {
 
     // 2. Exigimos el rechazo
     expect(response.status).toBe(404);
-
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toBe('Servicio no encontrado');
-  });
+    });
 
     // Sad Path: ID con formato inválido
     it('Debería devolver estado 400 si el formato del ID es inválido', async () => {
@@ -115,11 +114,94 @@ describe('API de Servicios', () => {
 
     // 2. Exigimos el rechazo
     expect(response.status).toBe(400);
-    
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toBe('Formato de ID inválido');
-  }); 
+    }); 
 
-  });
+    });
+
+  // Endpoint para modificar datos específicos
+  describe('PATCH /servicios/:id', () => {
+  
+    it('Debería actualizar exitosamente el precio y devolver estado 200', async () => {
+    
+    // Happy Path: Actualización exitosa
+    const response = await request(app)
+      .patch('/servicios/1')
+      .send({
+        precio: 800
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('precio', 800);
+    expect(response.body).toHaveProperty('nombre_comercial', 'Desarrollo Web');
+    });
+
+    // Sad Path: Actualizar ID inexistente
+    it('Debería devolver estado 404 si el ID a actualizar no existe', async () => {
+    // Envía: ID que no existe
+    const response = await request(app)
+      .patch('/servicios/9999')
+      .send({
+        precio: 800
+      });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toBe('Servicio no encontrado');
+    });
+
+    // Sad Path: ID con formato inválido
+    it('Debería devolver estado 400 si el formato del ID es inválido', async () => {
+    // "Envía: ID inválido"
+    const response = await request(app)
+      .patch('/servicios/hola')
+      .send({
+        precio: 800
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toBe('Formato de ID inválido');
+    });
+
+    });
+
+  // Endpoint para borrar un servicio
+  describe('DELETE /servicios/:id', () => {
+  
+  it('Debería eliminar un servicio exitosamente y devolver estado 204', async () => {
+    
+    // Happy Path: Eliminación exitosa
+    // 1. Enviamos la petición DELETE a un ID válido
+    const response = await request(app).delete('/servicios/1');
+
+    // 2. Esperamos el estado 204 (No Content)
+    expect(response.status).toBe(204);
+
+    // 3. Verificamos que efectivamente el servidor no devuelva ningún cuerpo
+    expect(response.body).toEqual({});
+    });
+
+    // Sad Path: Eliminar ID inexistente
+    it('Debería devolver estado 404 si se intenta eliminar un ID inexistente', async () => {
+    // "Envía: Un ID que ya fue borrado o no existe"
+    const response = await request(app).delete('/servicios/9999');
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Servicio no encontrado');
+    });
+
+    // Sad Path: ID con formato inválido
+    it('Debería devolver estado 400 si el formato del ID es inválido', async () => {
+    // "Envía: Letras en lugar de números"
+    const response = await request(app).delete('/servicios/hola');
+
+    // "Espera: Estado 400 (Bad Request)"
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'Formato de ID inválido');
+    });
+
+    });
 
 });

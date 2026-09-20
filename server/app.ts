@@ -80,4 +80,72 @@ app.get('/servicios/:id', (req: Request, res: Response) => {
   res.status(200).json(servicioEncontrado);
 });
 
+// Endpoint para modificar datos específicos
+app.patch('/servicios/:id', (req: Request, res: Response) => {
+  
+  const { id } = req.params;
+  const datosNuevos = req.body;
+
+  // Sad Path: ID con formato inválido
+  // Si intentan convertir el ID a número y da NaN
+  if (isNaN(Number(id))) {
+    return res.status(400).json({
+      error: 'Formato de ID inválido'
+    });
+  }
+
+  // Sad Path: Actualizar ID inexistente
+  // Simulamos que Prisma buscó en la BD y no encontró nada
+  if (id === '9999') {
+    return res.status(404).json({
+      error: 'Servicio no encontrado'
+    });
+  }
+
+  // Happy Path: Actualización exitosa
+  // 2. Simulamos el servicio como estaba en la BD antes del cambio
+  const servicioViejo = {
+    id_servicio: id,
+    nombre_comercial: "Desarrollo Web",
+    modelo_cobro: "Fijo",
+    precio: 500 // precio viejo!
+  };
+
+  // 3. Fusionamos ambos usando spread operator (...)
+  const servicioActualizado = {
+    ...servicioViejo,
+    ...datosNuevos
+  };
+
+  // 4. Respondemos con el código 200 y el objeto ya fusionado
+  res.status(200).json(servicioActualizado);
+});
+
+// Endpoint para borrar un servicio
+app.delete('/servicios/:id', (req: Request, res: Response) => {
+  // 1. Extraemos el ID de la URL
+  const { id } = req.params;
+
+  // Sad Path: ID con formato inválido
+  if (isNaN(Number(id))) {
+    return res.status(400).json({
+      error: 'Formato de ID inválido'
+    });
+  }
+
+  // Sad Path: Eliminar ID inexistente
+  if (id === '9999') {
+    return res.status(404).json({
+      error: 'Servicio no encontrado'
+    });
+  }
+
+  // Happy Path: Eliminación exitosa
+  // 2. Aquí en el futuro Prisma ejecutará: await prisma.servicio.delete({ where: { id } })
+  // Por ahora simulamos que la eliminación física en la BD fue un éxito.
+
+  // 3. Respondemos con 204 y enviamos la respuesta vacía (.send)
+  res.status(204).send();
+});
+
 export { app };
