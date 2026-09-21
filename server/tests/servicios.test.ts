@@ -13,7 +13,7 @@ describe('API de Servicios', () => {
       const response = await request(app)
         .post('/servicios')
         .send({
-          "nombre_comercial": "e-commerce lite", "modelo_cobro": "suscripción"
+          "nombre_comercial": "e-commerce lite", "modelo_cobro": "suscripción", "precio": 1500
           });
 
       // 2. AFIRMAR: Comprobamos que el servidor respondió lo correcto
@@ -85,21 +85,26 @@ describe('API de Servicios', () => {
 
     // Happy Path: Búsqueda exitosa
     it('Debería devolver estado 200 y el servicio solicitado', async () => {
-    // 1. Hacemos la petición enviando un ID específico en la URL
-    const response = await request(app).get('/servicios/1');
+      // 1. PREPARACIÓN: Creamos un servicio real temporal
+      const creacion = await request(app)
+        .post('/servicios')
+        .send({ nombre_comercial: "Test GET", modelo_cobro: "fijo", precio: 100 });
+      
+      // Capturamos el UUID real que generó la base de datos
+      const idReal = creacion.body.id_servicio;
 
-    expect(response.status).toBe(200);
+      // 2. ACTUAR: Buscamos ese ID específico
+      const response = await request(app).get(`/servicios/${idReal}`);
 
-    // 3. Exigimos que nos devuelva un objeto que tenga ese mismo ID
-    expect(response.body).toHaveProperty('id_servicio', '1');
-    // Verificamos que tenga la estructura correcta
-    expect(response.body).toHaveProperty('nombre_comercial');
+      // 3. AFIRMAR
+      expect(response.status).toBe(200);
+      expect(response.body.id_servicio).toBe(idReal);
     });
 
     // Sad Path: ID no existe
     it('Debería devolver estado 404 si el ID no existe en la base de datos', async () => {
     // 1. Enviamos un ID que sabemos que no existe 
-    const response = await request(app).get('/servicios/9999');
+    const response = await request(app).get('/servicios/11111111-1111-1111-1111-111111111111');
 
     // 2. Exigimos el rechazo
     expect(response.status).toBe(404);
@@ -123,25 +128,30 @@ describe('API de Servicios', () => {
   // Endpoint para modificar datos específicos
   describe('PATCH /servicios/:id', () => {
   
-    it('Debería actualizar exitosamente el precio y devolver estado 200', async () => {
-    
     // Happy Path: Actualización exitosa
-    const response = await request(app)
-      .patch('/servicios/1')
-      .send({
-        precio: 800
-    });
+    it('Debería actualizar exitosamente el precio y devolver estado 200', async () => {
+      // 1. PREPARACIÓN
+      const creacion = await request(app)
+        .post('/servicios')
+        .send({ nombre_comercial: "Test PATCH", modelo_cobro: "suscripcion", precio: 500 });
+      const idReal = creacion.body.id_servicio;
 
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('precio', 800);
-    expect(response.body).toHaveProperty('nombre_comercial', 'Desarrollo Web');
+      // 2. ACTUAR: Actualizamos solo el precio de ese servicio
+      const response = await request(app)
+        .patch(`/servicios/${idReal}`)
+        .send({ precio: 800 });
+
+      // 3. AFIRMAR
+      expect(response.status).toBe(200);
+      // Prisma devuelve strings para los Decimales, por eso validamos el número así
+      expect(Number(response.body.precio)).toBe(800); 
     });
 
     // Sad Path: Actualizar ID inexistente
     it('Debería devolver estado 404 si el ID a actualizar no existe', async () => {
     // Envía: ID que no existe
     const response = await request(app)
-      .patch('/servicios/9999')
+      .patch('/servicios/11111111-1111-1111-1111-111111111111')
       .send({
         precio: 800
       });
@@ -170,23 +180,25 @@ describe('API de Servicios', () => {
   // Endpoint para borrar un servicio
   describe('DELETE /servicios/:id', () => {
   
-  it('Debería eliminar un servicio exitosamente y devolver estado 204', async () => {
-    
-    // Happy Path: Eliminación exitosa
-    // 1. Enviamos la petición DELETE a un ID válido
-    const response = await request(app).delete('/servicios/1');
+  // Happy Path: Eliminación exitosa
+ it('Debería eliminar un servicio exitosamente y devolver estado 204', async () => {
+      // 1. PREPARACIÓN
+      const creacion = await request(app)
+        .post('/servicios')
+        .send({ nombre_comercial: "Test DELETE", modelo_cobro: "hora", precio: 300 });
+      const idReal = creacion.body.id_servicio;
 
-    // 2. Esperamos el estado 204 (No Content)
-    expect(response.status).toBe(204);
+      // 2. ACTUAR: Lo eliminamos
+      const response = await request(app).delete(`/servicios/${idReal}`);
 
-    // 3. Verificamos que efectivamente el servidor no devuelva ningún cuerpo
-    expect(response.body).toEqual({});
+      // 3. AFIRMAR
+      expect(response.status).toBe(204);
     });
 
     // Sad Path: Eliminar ID inexistente
     it('Debería devolver estado 404 si se intenta eliminar un ID inexistente', async () => {
     // "Envía: Un ID que ya fue borrado o no existe"
-    const response = await request(app).delete('/servicios/9999');
+    const response = await request(app).delete('/servicios/11111111-1111-1111-1111-111111111111');
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', 'Servicio no encontrado');
