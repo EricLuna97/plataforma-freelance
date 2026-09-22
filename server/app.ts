@@ -133,4 +133,124 @@ app.delete('/servicios/:id', async (req: Request, res: Response) => {
   }
 });
 
+app.post('/clientes', async (req: Request, res: Response) => {
+  try {
+    const { nombre, email } = req.body;
+
+    // 1. ESCUDOS: Exactamente como los exigen los tests
+    if (!nombre) {
+      return res.status(400).json({ error: 'El nombre es obligatorio' });
+    }
+    if (!email) {
+      return res.status(400).json({ error: 'El email es obligatorio' });
+    }
+
+    // 2. CREACIÓN: Le pedimos a Prisma que guarde el cliente
+    const nuevoCliente = await prisma.cliente.create({
+      data: {
+        nombre,
+        email
+      }
+    });
+
+    // 3. RESPUESTA: Devolvemos código 201 y el objeto recién creado (que ya traerá el id_cliente y la fecha_registro)
+    res.status(201).json(nuevoCliente);
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear el cliente' });
+  }
+});
+
+app.get('/clientes', async (req: Request, res: Response) => {
+  try {
+    const clientes = await prisma.cliente.findMany();
+    res.status(200).json(clientes);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener los clientes' });
+  }
+});
+
+app.get('/clientes/:id', async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    // 1. ESCUDO DE FORMATO UUID
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Formato de ID inválido' });
+    }
+
+    // 2. BUSCAMOS EN LA BD 
+    const cliente = await prisma.cliente.findUnique({
+      where: { id_cliente: id } 
+    });
+
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+
+    res.status(200).json(cliente);
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener el cliente' });
+  }
+});
+// Endpoint para modificar datos específicos
+app.patch('/clientes/:id', async (req: Request, res: Response) => {
+  try {
+  const id = req.params.id as string;
+  // 1. ESCUDO DE FORMATO UUID
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Formato de ID inválido' });
+    }
+
+    // Extraemos lo que sea que nos hayan enviado en el body 
+    const { nombre, email, fecha_registro } = req.body;
+
+    // 2. ACTUALIZAMOS DIRECTO EN LA BD
+    const clienteActualizado = await prisma.cliente.update({
+      where: { id_cliente: id },
+      data: {
+        nombre, email, fecha_registro
+      }
+    });
+
+    res.status(200).json(clienteActualizado);
+
+  } catch (error: any) {
+    // Si Prisma no encuentra el ID para actualizar, lanza el error P2025
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    res.status(500).json({ error: 'Error al actualizar el cliente' });
+  }
+});
+
+// Endpoint para borrar un cliente
+app.delete('/clientes/:id', async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    // ESCUDO DE FORMATO UUID
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Formato de ID inválido' });
+    }
+
+    // ELIMINAMOS DIRECTO EN LA BD
+    await prisma.cliente.delete({
+      where: { id_cliente: id }
+    });
+
+    res.status(204).send();
+
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    res.status(500).json({ error: 'Error al eliminar el cliente' });
+  }
+});
+
 export { app };
