@@ -253,4 +253,118 @@ app.delete('/clientes/:id', async (req: Request, res: Response) => {
   }
 });
 
+app.post('/solicitudes', async (req: Request, res: Response) => {
+  try {
+    const { id_cliente, id_servicio, estado, mensaje_adicional } = req.body;
+
+    // 1. ESCUDOS: Verificar que vengan los datos obligatorios
+    if (!id_cliente || !id_servicio || !estado) {
+      return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
+
+    // 2. CREACIÓN: Le pedimos a Prisma que guarde la solicitud
+    const nuevaSolicitud = await prisma.solicitud.create({
+      data: {
+        id_cliente,
+        id_servicio,
+        estado,
+        mensaje_adicional // Prisma sabe que este es opcional
+      }
+    });
+
+    // 3. RESPUESTA: Todo OK
+    res.status(201).json(nuevaSolicitud);
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear la solicitud' });
+  }
+});
+
+app.get('/solicitudes', async (req: Request, res: Response) => {
+  try {
+    const solicitudes = await prisma.solicitud.findMany();
+    res.status(200).json(solicitudes);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener las solicitudes' });
+  }
+});
+
+app.get('/solicitudes/:id', async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Formato de ID inválido' });
+    }
+
+    const solicitud = await prisma.solicitud.findUnique({
+      where: { id_solicitud: id } 
+    });
+
+    if (!solicitud) {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+
+    res.status(200).json(solicitud);
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener la solicitud' });
+  }
+});
+
+app.patch('/solicitudes/:id', async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Formato de ID inválido' });
+    }
+
+    const { id_cliente, id_servicio, estado, mensaje_adicional } = req.body;
+
+    const solicitudActualizada = await prisma.solicitud.update({
+      where: { id_solicitud: id },
+      data: {
+        id_cliente, 
+        id_servicio, 
+        estado, 
+        mensaje_adicional
+      }
+    });
+
+    res.status(200).json(solicitudActualizada);
+
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+    res.status(500).json({ error: 'Error al actualizar la solicitud' });
+  }
+});
+
+app.delete('/solicitudes/:id', async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Formato de ID inválido' });
+    }
+
+    await prisma.solicitud.delete({
+      where: { id_solicitud: id }
+    });
+
+    res.status(204).send();
+
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Solicitud no encontrada' });
+    }
+    res.status(500).json({ error: 'Error al eliminar la solicitud' });
+  }
+});
+
 export { app };
