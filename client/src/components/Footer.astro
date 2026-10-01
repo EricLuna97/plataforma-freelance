@@ -1,0 +1,25 @@
+---
+// src/components/Footer.astro
+const anioActual = new Date().getFullYear();
+---
+
+<footer class="w-full bg-slate-900 text-slate-400 py-12 border-t border-slate-800 mt-20">
+  <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-sm">
+    
+    <div>
+      <p class="font-medium text-slate-200">Eric Luna — Soluciones de Software</p>
+      <p class="text-slate-500 mt-1">Desarrollo web robusto, modular y centrado en resultados.</p>
+    </div>
+
+    <div class="flex items-center gap-6">
+      <a href="#sobre-mi" class="hover:text-slate-200 transition-colors">Sobre Mí</a>
+      <a href="#servicios" class="hover:text-slate-200 transition-colors">Servicios</a>
+      <a href="#contacto" class="hover:text-slate-200 transition-colors">Contacto</a>
+    </div>
+
+    <div class="text-slate-500 text-xs">
+      &copy; {anioActual} Todos los derechos reservados.
+    </div>
+
+  </div>
+</footer>

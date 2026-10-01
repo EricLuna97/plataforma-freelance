@@ -1,0 +1,46 @@
+---
+// src/components/Servicios.astro
+import TarjetaServicio from './TarjetaServicio.astro';
+
+// Datos temporales de estructura (luego vendrán del backend)
+const servicios = [
+  {
+    titulo: "Desarrollo Web & Landing Pages",
+    descripcion: "Sitios optimizados para convertir visitantes en clientes potenciales.",
+    precio: "Desde $400",
+    caracteristicas: ["Diseño adaptable a móviles", "Optimización SEO inicial", "Formulario de contacto"]
+  },
+  {
+    titulo: "Aplicaciones Web a Medida",
+    descripcion: "Sistemas digitales y paneles para automatizar operaciones de negocio.",
+    precio: "Desde $1,200",
+    caracteristicas: ["Autenticación de usuarios", "Base de datos integrada", "Panel de administración"]
+  },
+  {
+    titulo: "Mantenimiento y Optimización",
+    descripcion: "Soporte técnico, mejoras de rendimiento y actualización de plataformas.",
+    precio: "Mensual / Consultar",
+    caracteristicas: ["Monitoreo de caídas", "Backups automáticos", "Soporte técnico directo"]
+  }
+];
+---
+
+<section id="servicios" class="py-16 border-t border-slate-200">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl font-bold text-slate-900 mb-3">Servicios y Soluciones</h2>
+    <p class="text-slate-600 max-w-xl mx-auto">
+      Soluciones técnicas orientadas a resolver problemas concretos de tu empresa.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    {servicios.map((servicio) => (
+      <TarjetaServicio 
+        titulo={servicio.titulo}
+        descripcion={servicio.descripcion}
+        precio={servicio.precio}
+        caracteristicas={servicio.caracteristicas}
+      />
+    ))}
+  </div>
+</section>

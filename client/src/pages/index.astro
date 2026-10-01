@@ -1,16 +1,18 @@
 ---
-// src/pages/index.astro
-import '../styles/global.css';
-import TarjetaServicio from '../components/TarjetaServicio.astro';
+import LayoutPrincipal from '../layouts/LayoutPrincipal.astro';
+import Hero from '../components/Hero.astro';
+import SobreMi from '../components/SobreMi.astro';
+import Servicios from '../components/Servicios.astro';
+import Contacto from '../components/Contacto.astro';
 ---
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Eric Luna | Desarrollador de Software</title>
-  </head>
-  <body class="bg-slate-50 text-slate-800 font-sans antialiased">
+<LayoutPrincipal>
   
-  </body>
-</html>
+  <main class="max-w-5xl mx-auto px-6 py-12 md:py-20">
+    <Hero />
+    <SobreMi />
+    <Servicios />
+    <Contacto />
+  </main>
+
+</LayoutPrincipal>

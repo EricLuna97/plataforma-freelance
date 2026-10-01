@@ -1,0 +1,32 @@
+---
+// src/components/TarjetaServicio.astro
+interface Props {
+  titulo: string;
+  descripcion: string;
+  precio: string;
+  caracteristicas: string[];
+}
+
+const { titulo, descripcion, precio, caracteristicas } = Astro.props;
+---
+
+<div class="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between shadow-sm">
+  <div>
+    <h3 class="text-xl font-bold text-slate-900 mb-2">{titulo}</h3>
+    <p class="text-slate-600 text-sm mb-4 leading-relaxed">{descripcion}</p>
+    <div class="text-2xl font-extrabold text-blue-600 mb-6">{precio}</div>
+
+    <ul class="space-y-2 mb-6">
+      {caracteristicas.map((item) => (
+        <li class="text-sm text-slate-600 flex items-center gap-2">
+          <span class="text-blue-500 font-bold">✓</span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <button class="w-full py-2 px-4 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors">
+    Solicitar Propuesta
+  </button>
+</div>
