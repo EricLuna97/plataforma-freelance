@@ -2,45 +2,57 @@
 // src/components/Servicios.astro
 import TarjetaServicio from './TarjetaServicio.astro';
 
-// Datos temporales de estructura (luego vendrán del backend)
 const servicios = [
   {
-    titulo: "Desarrollo Web & Landing Pages",
-    descripcion: "Sitios optimizados para convertir visitantes en clientes potenciales.",
-    precio: "Desde $400",
-    caracteristicas: ["Diseño adaptable a móviles", "Optimización SEO inicial", "Formulario de contacto"]
+    titulo: "E-commerce Lite",
+    descripcion: "Tiendas ligeras y rápidas con catálogo y redireccionamiento de clientes a WhatsApp.",
+    caracteristicas: ["Catálogo dinámico", "Contacto", "Panel de gestión"],
+    destacado: false,
+    icono: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart preview-icon"><path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18"/><path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25"/><circle cx="18" cy="20" r="2"/><circle cx="8" cy="20" r="2"/></svg>`
   },
   {
-    titulo: "Aplicaciones Web a Medida",
-    descripcion: "Sistemas digitales y paneles para automatizar operaciones de negocio.",
-    precio: "Desde $1,200",
-    caracteristicas: ["Autenticación de usuarios", "Base de datos integrada", "Panel de administración"]
+    titulo: "Desarrollo a medida",
+    descripcion: "Página Personal, Tienda virtual, Punto de venta, Panel administrativo, Tu idea, Tu proyecto.",
+    caracteristicas: ["Interfaz Visual", "Base De Datos", "Documentación"],
+    destacado: true,
+    icono: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-monitor-cloud preview-icon"><path d="M11 13a3 3 0 1 1 2.83-4H14a2 2 0 0 1 0 4z"/><path d="M12 17v4"/><path d="M8 21h8"/><rect x="2" y="3" width="20" height="14" rx="2"/></svg>`
   },
   {
-    titulo: "Mantenimiento y Optimización",
-    descripcion: "Soporte técnico, mejoras de rendimiento y actualización de plataformas.",
-    precio: "Mensual / Consultar",
-    caracteristicas: ["Monitoreo de caídas", "Backups automáticos", "Soporte técnico directo"]
+    titulo: "Refactorización y Testing",
+    descripcion: "Mejora de sistemas con pruebas automatizadas y arquitectura limpia.",
+    caracteristicas: ["Verificación", "Solución de errores", "Modernización"],
+    destacado: false,
+    icono: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bolt preview-icon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><circle cx="12" cy="12" r="4"/></svg>`
   }
 ];
 ---
 
-<section id="servicios" class="py-16 border-t border-slate-200">
-  <div class="text-center mb-12">
-    <h2 class="text-3xl font-bold text-slate-900 mb-3">Servicios y Soluciones</h2>
-    <p class="text-slate-600 max-w-xl mx-auto">
-      Soluciones técnicas orientadas a resolver problemas concretos de tu empresa.
-    </p>
-  </div>
+<section id="servicios" class="py-24 relative">
+  <div class="max-w-6xl mx-auto px-6">
+    
+    <div class="flex flex-col items-center text-center mb-16">
+      <span class="text-xs font-mono tracking-widest text-zinc-600 uppercase mb-4 block">
+        // Mis Servicios
+      </span>
+      <h2 class="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+        Soluciones Más Solicitadas
+      </h2>
+      <p class="text-zinc-400 text-lg max-w-2xl">
+        Del prototipo a producción, con calidad respaldada por pruebas.
+      </p>
+    </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-    {servicios.map((servicio) => (
-      <TarjetaServicio 
-        titulo={servicio.titulo}
-        descripcion={servicio.descripcion}
-        precio={servicio.precio}
-        caracteristicas={servicio.caracteristicas}
-      />
-    ))}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {servicios.map((servicio) => (
+        <TarjetaServicio 
+          titulo={servicio.titulo}
+          descripcion={servicio.descripcion}
+          caracteristicas={servicio.caracteristicas}
+          destacado={servicio.destacado}
+          icono={servicio.icono}
+        />
+      ))}
+    </div>
+
   </div>
 </section>

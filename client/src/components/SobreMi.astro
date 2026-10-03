@@ -2,27 +2,24 @@
 // src/components/SobreMi.astro
 ---
 
-<section id="sobre-mi" class="py-16 border-t border-slate-200">
-  <div class="max-w-3xl mx-auto">
-    <h2 class="text-3xl font-bold text-slate-900 mb-6 text-center">Sobre Mí</h2>
+<section id="sobre-mi" class="py-24 border-t border-zinc-800/50">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold text-white mb-6 tracking-tight">Sobre Mí</h2>
     
-    <div class="space-y-4 text-slate-600 text-lg leading-relaxed">
+    <div class="space-y-6 text-zinc-400 text-lg leading-relaxed">
       <p>
-        Me especializo en el desarrollo de software de extremo a extremo, priorizando código limpio, modularidad y cobertura de pruebas automatizadas.
-      </p>
-      <p>
-        Mi flujo de trabajo combina el diseño de APIs seguras y desacopladas en el backend con interfaces de usuario modernas, ligeras y orientadas a componentes en el frontend.
-      </p>
+        Soy desarrollador de software certificado y titulado, especializado en diseñar e implementar soluciones tecnológicas 
+        a medida para empresas y emprendedores. Me encargo de traducir las necesidades operativas de tu negocio en software 
+        eficiente y seguro. Desde la creación de plataformas de comercio electrónico, bases de datos, chats automatizados, 
+        hasta el desarrollo de sistemas de gestión interna, mi objetivo es optimizar procesos, reducir costos operativos, escalar tus ventas mediante tecnología robusta y mejorar sistemas.</p>
     </div>
 
-    <!-- Píldoras de tecnologías clave -->
-    <div class="mt-8 flex flex-wrap justify-center gap-2">
-      <span class="px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-md">TypeScript</span>
-      <span class="px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-md">Node.js / Express</span>
-      <span class="px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-md">PostgreSQL</span>
-      <span class="px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-md">Astro</span>
-      <span class="px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-md">React</span>
-      <span class="px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-md">Tailwind CSS</span>
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      {['TypeScript', 'Node.js / Express', 'PostgreSQL', 'Astro', 'React', 'Tailwind CSS'].map(tech => (
+        <span class="px-4 py-1.5 bg-zinc-900/50 border border-zinc-800 text-zinc-300 text-sm font-medium rounded-full">
+          {tech}
+        </span>
+      ))}
     </div>
   </div>
 </section>

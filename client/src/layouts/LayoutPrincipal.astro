@@ -1,26 +1,30 @@
 ---
+// src/layouts/LayoutPrincipal.astro
 import '../styles/global.css';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<html lang="es">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Eric Luna | Desarrollador de Software</title>
+    <title>Eric Luna | Soluciones de Software</title>
   </head>
-  <body class="bg-slate-50 text-slate-800 font-sans antialiased flex flex-col min-h-screen">
+  <body class="text-zinc-300 font-sans antialiased flex flex-col min-h-screen selection:bg-blue-900/50 selection:text-white relative">
     
-    <!-- Barra superior fija -->
+    <!-- 1. Fondo base con degradado azul profundo y moderno en diagonal -->
+    <div class="fixed inset-0 z-[-2] bg-linear-to-br from-[#020617] via-[#0a0a0a] to-[#0a192f]"></div>
+    
+    <!-- 2. Cuadrícula global (ahora abarca 100% de la pantalla) -->
+    <div class="fixed inset-0 z-[-1] bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size:32px_32px"></div>
+    
     <Navbar />
     
-    <!-- Contenido inyectado dinámicamente por cada página -->
     <div class="grow">
       <slot /> 
     </div>
     
-    <!-- Pie de página fijo -->
     <Footer />
     
   </body>

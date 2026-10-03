@@ -2,78 +2,33 @@
 // src/components/Contacto.astro
 ---
 
-<section id="contacto" class="py-16 border-t border-slate-200">
-  <div class="max-w-2xl mx-auto">
-    <div class="text-center mb-10">
-      <h2 class="text-3xl font-bold text-slate-900 mb-2">Hablemos de tu Proyecto</h2>
-      <p class="text-slate-600">
-        Cuéntame qué necesitas resolver o automatizar en tu negocio y definimos una propuesta.
+<section id="cotizar" class="py-24 border-t border-zinc-800/50">
+  <div class="max-w-2xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-white mb-4 tracking-tight">Hablemos de tu Proyecto</h2>
+      <p class="text-zinc-400">
+        Cuéntame qué necesitas resolver o automatizar y definimos una propuesta.
       </p>
     </div>
 
-    <form class="space-y-6 bg-white p-8 border border-slate-200 rounded-2xl shadow-sm">
-      <div>
-        <label for="nombre" class="block text-sm font-medium text-slate-700 mb-2">
-          Nombre completo
-        </label>
-        <input 
-          type="text" 
-          id="nombre" 
-          name="nombre" 
-          placeholder="Ej: Juan Pérez"
-          required 
-          class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-400"
-        />
+    <form class="space-y-6 bg-zinc-900/30 p-8 md:p-10 border border-zinc-800 rounded-2xl backdrop-blur-sm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-zinc-400 mb-2">Nombre completo</label>
+          <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950/50 text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors" />
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-zinc-400 mb-2">Correo electrónico</label>
+          <input type="email" id="email" placeholder="tu@empresa.com" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950/50 text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors" />
+        </div>
       </div>
 
       <div>
-        <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
-          Correo electrónico
-        </label>
-        <input 
-          type="email" 
-          id="email" 
-          name="email" 
-          placeholder="tu@empresa.com"
-          required 
-          class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-400"
-        />
+        <label for="mensaje" class="block text-sm font-medium text-zinc-400 mb-2">Detalle del requerimiento</label>
+        <textarea id="mensaje" rows="4" placeholder="Describe brevemente los objetivos o funcionalidades clave..." required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950/50 text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors resize-none"></textarea>
       </div>
 
-      <div>
-        <label for="tipo_proyecto" class="block text-sm font-medium text-slate-700 mb-2">
-          ¿En qué puedo ayudarte?
-        </label>
-        <select 
-          id="tipo_proyecto" 
-          name="tipo_proyecto" 
-          class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 bg-white"
-        >
-          <option value="landing">Sitio web o Landing Page</option>
-          <option value="app">Aplicación web / Sistema a medida</option>
-          <option value="mantenimiento">Mantenimiento o integración técnica</option>
-          <option value="otro">Otro requerimiento</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="mensaje" class="block text-sm font-medium text-slate-700 mb-2">
-          Detalle del requerimiento
-        </label>
-        <textarea 
-          id="mensaje" 
-          name="mensaje" 
-          rows="4" 
-          placeholder="Describe brevemente los objetivos, plazos o funcionalidades clave..."
-          required 
-          class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-400 resize-none"
-        ></textarea>
-      </div>
-
-      <button 
-        type="submit" 
-        class="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm cursor-pointer"
-      >
+      <button type="submit" class="w-full py-4 px-6 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]">
         Enviar Consulta
       </button>
     </form>

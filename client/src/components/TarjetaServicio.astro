@@ -3,30 +3,38 @@
 interface Props {
   titulo: string;
   descripcion: string;
-  precio: string;
   caracteristicas: string[];
+  destacado?: boolean;
+  icono: string;
 }
 
-const { titulo, descripcion, precio, caracteristicas } = Astro.props;
+const { titulo, descripcion, caracteristicas, destacado = false, icono } = Astro.props;
 ---
 
-<div class="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between shadow-sm">
-  <div>
-    <h3 class="text-xl font-bold text-slate-900 mb-2">{titulo}</h3>
-    <p class="text-slate-600 text-sm mb-4 leading-relaxed">{descripcion}</p>
-    <div class="text-2xl font-extrabold text-blue-600 mb-6">{precio}</div>
+<div class={`relative flex flex-col p-8 rounded-2xl border ${destacado ? 'border-zinc-500 bg-zinc-800/20' : 'border-zinc-800 bg-zinc-900/30'} transition-colors hover:border-zinc-700`}>
+  
+  {destacado && (
+    <span class="absolute -top-3 left-8 px-3 py-1 text-xs font-semibold bg-zinc-200 text-zinc-900 rounded-full">
+      Más solicitado
+    </span>
+  )}
 
-    <ul class="space-y-2 mb-6">
+  <!-- Contenedor del ícono -->
+    <div class="w-12 h-12 flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 mb-6 text-zinc-400" set:html={icono}>
+</div>
+
+  <h3 class="text-xl font-bold text-white mb-2">{titulo}</h3>
+  <p class="text-sm text-zinc-400 mb-8 leading-relaxed">{descripcion}</p>
+
+  <!-- Lista de características con borde superior -->
+  <div class="mt-auto pt-6 border-t border-zinc-800/60">
+    <ul class="space-y-4">
       {caracteristicas.map((item) => (
-        <li class="text-sm text-slate-600 flex items-center gap-2">
-          <span class="text-blue-500 font-bold">✓</span>
+        <li class="text-sm text-zinc-400 flex items-center gap-3">
+          <svg class="w-4 h-4 text-zinc-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           <span>{item}</span>
         </li>
       ))}
     </ul>
   </div>
-
-  <button class="w-full py-2 px-4 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors">
-    Solicitar Propuesta
-  </button>
 </div>
