@@ -1,5 +1,6 @@
 ---
 // src/components/Contacto.astro
+import {Formulario} from './FormularioContacto.tsx';
 ---
 
 <section id="cotizar" class="py-24 border-t border-zinc-800/50">
@@ -10,27 +11,6 @@
         Cuéntame qué necesitas resolver o automatizar y definimos una propuesta.
       </p>
     </div>
-
-    <form class="space-y-6 bg-zinc-900/30 p-8 md:p-10 border border-zinc-800 rounded-2xl backdrop-blur-sm">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label for="nombre" class="block text-sm font-medium text-zinc-400 mb-2">Nombre completo</label>
-          <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950/50 text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors" />
-        </div>
-        <div>
-          <label for="email" class="block text-sm font-medium text-zinc-400 mb-2">Correo electrónico</label>
-          <input type="email" id="email" placeholder="tu@empresa.com" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950/50 text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors" />
-        </div>
-      </div>
-
-      <div>
-        <label for="mensaje" class="block text-sm font-medium text-zinc-400 mb-2">Detalle del requerimiento</label>
-        <textarea id="mensaje" rows="4" placeholder="Describe brevemente los objetivos o funcionalidades clave..." required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950/50 text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors resize-none"></textarea>
-      </div>
-
-      <button type="submit" class="w-full py-4 px-6 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]">
-        Enviar Consulta
-      </button>
-    </form>
+      <Formulario client:visible />
   </div>
 </section>
