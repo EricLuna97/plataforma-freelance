@@ -29,3 +29,16 @@ pnpm-debug.log*
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# IA
+
+.agents/
+.claude/
+.cursor/
+.devin/
+client/AGENTS.md 
+client/CLAUDE.md 
+server/.agents/
+server/.claude/
+server/.cursor/
+server/.devin/
