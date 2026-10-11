@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 
 export function Formulario() {
     const [datos, setDatos] = useState({
@@ -7,7 +7,7 @@ export function Formulario() {
         mensaje: ''
     });
 
-    const [estadoEnvio, setEstadoEnvio] = useState('inactivo');
+    const [estadoEnvio, setEstadoEnvio] = useState('inactivo'); // 'inactivo' | 'cargando' | 'exito' | 'error'
 
     const manejarCambio = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setDatos({
@@ -19,11 +19,28 @@ export function Formulario() {
     const manejarEnvio = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         setEstadoEnvio('cargando');
-        setTimeout(() => {
-            console.log("Datos listos para mandar al servidor:", datos);
+
+        try {
+            const response = await fetch('http://localhost:3000/solicitudes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
             setEstadoEnvio('exito');
             setDatos({ nombre: '', email: '', mensaje: '' });
-        }, 2000);
+            setTimeout(() => setEstadoEnvio('inactivo'), 3000);
+
+        } catch (error) {
+            console.error("Error al enviar:", error);
+            setEstadoEnvio('error');
+            setTimeout(() => setEstadoEnvio('inactivo'), 4000);
+        }
     };
 
   return (
@@ -47,6 +64,14 @@ export function Formulario() {
       <button type="submit" disabled={estadoEnvio === 'cargando'} className="w-full py-4 px-6 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:cursor-not-allowed">
         {estadoEnvio === 'cargando' ? 'Enviando...' : 'Enviar Consulta'}
       </button>
+
+      {/* Mensajes de feedback para el usuario */}
+      {estadoEnvio === 'exito' && (
+        <p className="text-green-400 text-sm text-center font-medium mt-2">¡Consulta enviada con éxito! Te responderé pronto.</p>
+      )}
+      {estadoEnvio === 'error' && (
+        <p className="text-red-400 text-sm text-center font-medium mt-2">Hubo un problema al enviar. Por favor, intentá de nuevo.</p>
+      )}
     </form>
   );
 }

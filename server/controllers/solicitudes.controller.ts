@@ -1,19 +1,49 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { enviarAlertaNuevoCliente } from '../utils/mailer';
 
 const prisma = new PrismaClient();
 
 export const crearSolicitud = async (req: Request, res: Response) => {
   try {
-    const { id_cliente, id_servicio, estado, mensaje_adicional } = req.body;
-    if (!id_cliente || !id_servicio || !estado) return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    // 1. Recibimos los datos tal como los manda el formulario de React
+    const { nombre, email, mensaje, id_servicio } = req.body;
 
-    const nuevaSolicitud = await prisma.solicitud.create({
-      data: { id_cliente, id_servicio, estado, mensaje_adicional }
+    // 2. Validamos que vengan los datos del form
+    if (!nombre || !email || !mensaje) {
+      return res.status(400).json({ error: 'Faltan nombre, email o mensaje' });
+    }
+
+    // 3. Prisma upsert: Busca al cliente por email. Si no existe, lo crea.
+    const cliente = await prisma.cliente.upsert({
+      where: { email: email },
+      update: { nombre: nombre }, 
+      create: { 
+        nombre: nombre, 
+        email: email 
+      }
     });
+
+    const consulta_general_id = '38a62b83-881f-4084-bf42-668362d2baa3';
+
+    // 4. Creamos la solicitud asociándola a ese cliente
+    const nuevaSolicitud = await prisma.solicitud.create({
+      data: { 
+        id_cliente: cliente.id_cliente, 
+        id_servicio: consulta_general_id, 
+        estado: 'PENDIENTE', // El estado inicial siempre será pendiente
+        mensaje_adicional: mensaje 
+      }
+    });
+
+    enviarAlertaNuevoCliente(nombre, email, mensaje).catch(err => {
+      console.error('Error enviando el email de alerta:', err);
+    });
+    
     res.status(201).json(nuevaSolicitud);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear la solicitud' });
+    console.error('Error creando solicitud:', error);
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 };
 
