@@ -14,9 +14,9 @@ app.use(cors());
 app.use(express.json()); 
 
 // 3. Conectamos las rutas
-app.use('/clientes', clientesRoutes);
-app.use('/servicios', serviciosRoutes);
-app.use('/solicitudes', solicitudesRoutes);
-app.use('/caracteristicas', caracteristicasRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/servicios', serviciosRoutes);
+app.use('/api/solicitudes', solicitudesRoutes);
+app.use('/api/caracteristicas', caracteristicasRoutes);
 
 export { app };
