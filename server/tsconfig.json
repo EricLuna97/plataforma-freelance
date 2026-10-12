@@ -9,5 +9,6 @@
     "types": ["jest", "node"],
     "outDir": "./dist"
   },
-  "include": ["**/*.ts"]
+    "include": ["**/*.ts"], 
+    "exclude": ["node_modules", "prisma.config.ts"]
 }
