@@ -31,21 +31,20 @@ export const crearSolicitud = async (req: Request, res: Response) => {
       data: { 
         id_cliente: cliente.id_cliente, 
         id_servicio: consulta_general_id, 
-        estado: 'PENDIENTE', // El estado inicial siempre será pendiente
+        estado: 'PENDIENTE',
         mensaje_adicional: mensaje 
       }
     });
 
-    enviarAlertaNuevoCliente(nombre, email, mensaje).catch(err => {
-      console.error('Error enviando el email de alerta:', err);
-    });
+    await enviarAlertaNuevoCliente(nombre, email, mensaje);
     
     res.status(201).json(nuevaSolicitud);
-  } catch (error) {
-    console.error('Error creando solicitud:', error);
-    res.status(500).json({ error: 'Error al procesar la solicitud' });
-  }
-};
+
+    } catch (error) {
+      console.error('Error enviando el email de alerta:', error);
+      res.status(500).json({ error: 'Error al procesar la solicitud' });
+    }
+  };
 
 export const obtenerSolicitudes = async (req: Request, res: Response) => {
   try {
