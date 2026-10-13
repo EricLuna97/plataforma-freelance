@@ -1,23 +1,15 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-// Configuramos la conexión con Gmail
-export const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // true para usar el puerto seguro 465
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  }
-});
+// Inicializamos Resend con la llave que pondremos en Render
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Función armadora del correo
 export const enviarAlertaNuevoCliente = async (nombre: string, emailCliente: string, mensaje: string) => {
-  const mailOptions = {
-    from: `"Plataforma Freelance" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_USER,
+  // Resend usa su propio método de envío
+  await resend.emails.send({
+    from: 'Acme <onboarding@resend.dev>', // Resend te da este correo temporal gratis para que funcione sin configurar dominios
+    to: process.env.EMAIL_USER as string, // Tu correo de Gmail a donde te van a llegar las alertas
     replyTo: emailCliente,
-    subject: `🚀 Nuevo cliente web: ${nombre}`,
+    subject: `Nuevo cliente web: ${nombre}`,
     html: `
       <h2>¡Tenés una nueva solicitud de trabajo!</h2>
       <p><strong>Nombre:</strong> ${nombre}</p>
@@ -28,7 +20,5 @@ export const enviarAlertaNuevoCliente = async (nombre: string, emailCliente: str
         ${mensaje}
       </p>
     `
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 };
