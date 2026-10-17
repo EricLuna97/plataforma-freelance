@@ -1,12 +1,16 @@
 import { Router } from 'express';
 import { crearServicio, obtenerServicios, obtenerServicioPorId, actualizarServicio, eliminarServicio } from '../controllers/servicios.controller';
+import { requerirApiKeyAdmin } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.post('/', crearServicio);
+// Lectura de catálogo pública
 router.get('/', obtenerServicios);
 router.get('/:id', obtenerServicioPorId);
-router.patch('/:id', actualizarServicio);
-router.delete('/:id', eliminarServicio);
+
+// Modificación y eliminación restringida a administradores
+router.post('/', requerirApiKeyAdmin, crearServicio);
+router.patch('/:id', requerirApiKeyAdmin, actualizarServicio);
+router.delete('/:id', requerirApiKeyAdmin, eliminarServicio);
 
 export default router;

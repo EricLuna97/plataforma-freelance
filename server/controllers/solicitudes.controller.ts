@@ -4,47 +4,110 @@ import { enviarAlertaNuevoCliente } from '../utils/mailer';
 
 const prisma = new PrismaClient();
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const crearSolicitud = async (req: Request, res: Response) => {
   try {
-    // 1. Recibimos los datos tal como los manda el formulario de React
-    const { nombre, email, mensaje, id_servicio } = req.body;
+    const { nombre, email, mensaje, id_servicio, id_cliente, estado, mensaje_adicional, telefono_confirmacion, sitio_web } = req.body;
 
-    // 2. Validamos que vengan los datos del form
-    if (!nombre || !email || !mensaje) {
-      return res.status(400).json({ error: 'Faltan nombre, email o mensaje' });
+    // 1. ESCUDO ANTI-BOTS (Honeypot): Si el bot llenó campos invisibles para humanos, descartamos en silencio
+    if (telefono_confirmacion || sitio_web) {
+      return res.status(201).json({ id_solicitud: 'ok', estado: 'PENDIENTE' });
     }
 
-    // 3. Prisma upsert: Busca al cliente por email. Si no existe, lo crea.
-    const cliente = await prisma.cliente.upsert({
-      where: { email: email },
-      update: { nombre: nombre }, 
-      create: { 
-        nombre: nombre, 
-        email: email 
+    // 2. FLUJO FORMULARIO WEB (nombre, email, mensaje)
+    if (nombre !== undefined || email !== undefined || mensaje !== undefined) {
+      const nombreLimpio = typeof nombre === 'string' ? nombre.trim() : '';
+      const emailLimpio = typeof email === 'string' ? email.trim().toLowerCase() : '';
+      const mensajeLimpio = typeof mensaje === 'string' ? mensaje.trim() : '';
+
+      if (!nombreLimpio || !emailLimpio || !mensajeLimpio) {
+        return res.status(400).json({ error: 'Faltan nombre, email o mensaje' });
       }
-    });
 
-    const consulta_general_id = '38a62b83-881f-4084-bf42-668362d2baa3';
+      if (nombreLimpio.length < 2 || nombreLimpio.length > 100) {
+        return res.status(400).json({ error: 'El nombre debe tener entre 2 y 100 caracteres' });
+      }
 
-    // 4. Creamos la solicitud asociándola a ese cliente
+      if (emailLimpio.length < 5 || emailLimpio.length > 150 || !EMAIL_REGEX.test(emailLimpio)) {
+        return res.status(400).json({ error: 'El email proporcionado no tiene un formato válido' });
+      }
+
+      if (mensajeLimpio.length < 5 || mensajeLimpio.length > 3000) {
+        return res.status(400).json({ error: 'El mensaje debe tener entre 5 y 3000 caracteres' });
+      }
+
+      // Upsert del cliente seguro
+      const cliente = await prisma.cliente.upsert({
+        where: { email: emailLimpio },
+        update: { nombre: nombreLimpio },
+        create: {
+          nombre: nombreLimpio,
+          email: emailLimpio
+        }
+      });
+
+      // Determinamos el servicio: si mandaron uno válido, lo usamos; sino buscamos el de consulta general o el primero activo
+      let servicioAsociadoId = id_servicio;
+      if (!servicioAsociadoId) {
+        const servicioGeneral = await prisma.servicio.findFirst({
+          where: { esta_activo: true }
+        });
+        if (servicioGeneral) {
+          servicioAsociadoId = servicioGeneral.id_servicio;
+        } else {
+          // Si no hay servicios creados en la BD, creamos uno base para evitar fallo de integridad referencial
+          const servicioNuevo = await prisma.servicio.create({
+            data: {
+              nombre_comercial: 'Consulta General',
+              modelo_cobro: 'A convenir',
+              esta_activo: true
+            }
+          });
+          servicioAsociadoId = servicioNuevo.id_servicio;
+        }
+      }
+
+      const nuevaSolicitud = await prisma.solicitud.create({
+        data: {
+          id_cliente: cliente.id_cliente,
+          id_servicio: servicioAsociadoId,
+          estado: 'PENDIENTE',
+          mensaje_adicional: mensajeLimpio
+        }
+      });
+
+      // Alerta por email protegida contra fallos
+      try {
+        await enviarAlertaNuevoCliente(nombreLimpio, emailLimpio, mensajeLimpio);
+      } catch (errEmail) {
+        console.error('Error enviando el email de alerta:', errEmail);
+      }
+
+      return res.status(201).json(nuevaSolicitud);
+    }
+
+    // 3. FLUJO DIRECTO DE API / TESTS (id_cliente, id_servicio, estado)
+    if (!id_cliente || !id_servicio || !estado) {
+      return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
+
     const nuevaSolicitud = await prisma.solicitud.create({
-      data: { 
-        id_cliente: cliente.id_cliente, 
-        id_servicio: consulta_general_id, 
-        estado: 'PENDIENTE',
-        mensaje_adicional: mensaje 
+      data: {
+        id_cliente,
+        id_servicio,
+        estado,
+        mensaje_adicional
       }
     });
 
-    await enviarAlertaNuevoCliente(nombre, email, mensaje);
-    
-    res.status(201).json(nuevaSolicitud);
+    return res.status(201).json(nuevaSolicitud);
 
-    } catch (error) {
-      console.error('Error enviando el email de alerta:', error);
-      res.status(500).json({ error: 'Error al procesar la solicitud' });
-    }
-  };
+  } catch (error) {
+    console.error('Error al procesar la solicitud:', error);
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
+  }
+};
 
 export const obtenerSolicitudes = async (req: Request, res: Response) => {
   try {
