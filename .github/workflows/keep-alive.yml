@@ -9,17 +9,28 @@ jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Ping Supabase API Health
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" -X GET "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/" \
+          # 1. Limpiar barras finales de la URL por si quedó alguna en los secrets
+          BASE_URL="${{ secrets.VITE_SUPABASE_URL }}"
+          CLEAN_URL="${BASE_URL%/}"
+
+          echo "Target base URL: $CLEAN_URL"
+
+          # 2. Ejecutar ping al health check de Supabase y capturar cuerpo + status
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$CLEAN_URL/auth/v1/health" \
             -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}")
-          
-          echo "Supabase HTTP status response: $response"
-          
-          if [ "$response" -eq 200 ] || [ "$response" -eq 206 ]; then
-            echo "Ping exitoso. La base de datos sigue activa."
+
+          STATUS_CODE=$(echo "$HTTP_RESPONSE" | tail -n 1)
+          BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
+
+          echo "Status recibido: $STATUS_CODE"
+          echo "Respuesta del servidor: $BODY"
+
+          if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 400 ]; then
+            echo "Ping exitoso. Instancia activa."
           else
-            echo "Alerta: Codigo recibido $response"
+            echo "Fallo en la peticion."
             exit 1
           fi
