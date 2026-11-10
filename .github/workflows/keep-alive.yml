@@ -2,35 +2,20 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    - cron: '0 12 * * 1,4'
+    # Corre lunes, miércoles y viernes a las 11:00 UTC
+    - cron: '0 11 * * 1,3,5'
   workflow_dispatch:
 
 jobs:
-  ping-supabase:
+  ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase API Health
+      - name: Ping PostgreSQL Engine
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          # 1. Limpiar barras finales de la URL por si quedó alguna en los secrets
-          BASE_URL="${{ secrets.VITE_SUPABASE_URL }}"
-          CLEAN_URL="${BASE_URL%/}"
-
-          echo "Target base URL: $CLEAN_URL"
-
-          # 2. Ejecutar ping al health check de Supabase y capturar cuerpo + status
-          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$CLEAN_URL/auth/v1/health" \
-            -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}")
-
-          STATUS_CODE=$(echo "$HTTP_RESPONSE" | tail -n 1)
-          BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
-
-          echo "Status recibido: $STATUS_CODE"
-          echo "Respuesta del servidor: $BODY"
-
-          if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 400 ]; then
-            echo "Ping exitoso. Instancia activa."
-          else
-            echo "Fallo en la peticion."
-            exit 1
-          fi
+          curl -f -X POST "$SUPABASE_URL/rest/v1/rpc/keep_alive" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json"
